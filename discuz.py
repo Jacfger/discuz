@@ -22,7 +22,8 @@ class DiscuzSpider:
         :param tid: 帖子的 id
         :return: 包含帖子信息的 dict
         """
-        url = 'https://www.discuz.net/thread-{}-1-1.html'.format(tid)
+        # url = 'https://www.discuz.net/thread-{}-1-1.html'.format(tid)
+        url = "https://www.hkitalk.net/HKiTalk2/thread-{}-1-1.html".format(tid)
         html = self._get_html(url)
         if not html: return {}
         soup = BeautifulSoup(html, 'lxml')
@@ -48,7 +49,7 @@ class DiscuzSpider:
         """
         html = self._get_html(url)
         if not html: return None
-        print('正在处理:' + url)
+        # print('正在处理:' + url)
         soup = BeautifulSoup(html, 'lxml')
         comments = []  # 要返回的评论信息列表
         table_plhin_list = soup.find_all('table', class_='plhin')  # 评论信息存在在 <table class='plhin'> 下面
@@ -68,7 +69,7 @@ class DiscuzSpider:
                 _content = cascaded_comment.find('div', class_='psti').get_text()  # 层叠的评论
                 a_comment.append({'uid': _uid, 'nickname': _nickname, 'content': _content})
             comments += a_comment
-        print("评论数据:" + str(comments))
+        # print("评论数据:" + str(comments))
         return comments
 
     def get_all_url(self, tid):
@@ -77,21 +78,21 @@ class DiscuzSpider:
         :param tid: 帖子 id
         :return: 包含所有页面链接的 list
         """
-        this_url = 'http://www.discuz.net/thread-{}-1-1.html'.format(tid)
+        this_url = 'https://www.hkitalk.net/HKiTalk2/thread-{}-1-1.html'.format(tid)
         html = self._get_html(this_url)
         if not html: return None
         soup = BeautifulSoup(html, 'lxml')
         last_page = soup.find('span', title=True)   # <span title="共 373 页" class="xh-highlight"> / 373 页</span>
         if last_page:
-            last_page = last_page.get_text().strip(' /页')       # 去除空白字符和"/"、"页",得到最大页数
-            return ['http://www.discuz.net/thread-{}-{}-1.html'.format(tid, i) for i in range(1, int(last_page) + 1)]
+            last_page = last_page.get_text().strip(' /頁')       # 去除空白字符和"/"、"页",得到最大页数
+            return ['https://www.hkitalk.net/HKiTalk2/thread-{}-{}-1.html'.format(tid, i) for i in range(1, int(last_page) + 1)]
         else:
             return [this_url]
 
     def parse(self, tid):
         all_data = {}
         post_info = self.parse_post_info(tid)
-        print('帖子信息:' + str(post_info))
+        # print('帖子信息:' + str(post_info))
         all_data.update(post_info)
         comments = []
         url_list = self.get_all_url(tid)
@@ -106,5 +107,6 @@ class DiscuzSpider:
 
 if __name__ == '__main__':
     spider = DiscuzSpider()
-    data = spider.parse(3846582)
+    # data = spider.parse(3846582)
+    data = spider.parse(2148137)
     print('*'*200 + '\n所有数据:' + str(data))
